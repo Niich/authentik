@@ -64,5 +64,39 @@ func (rs *RadiusServer) Handle_AccessRequest(w radius.ResponseWriter, r *RadiusR
 		}).Inc()
 		return
 	}
-	_ = w.Write(r.Response(radius.CodeAccessAccept))
+
+	// Now that we know they have access we can add attributes to the response
+
+	// create the response packet
+	responsePacket := r.Response(radius.CodeAccessAccept)
+
+	// use the akAPI to get attribute values to add from the application
+	// rs.ac.Client.PropertymappingsApi.PropertymappingsSamlList()
+	// r.pi.s.
+
+	attr, err := radius.NewString("shell:priv-lvl=15")
+	if err != nil {
+		r.Log().WithField("username", username).WithError(err).Warning("failed to create attribute")
+		metrics.RequestsRejected.With(prometheus.Labels{
+			"outpost_name": rs.ac.Outpost.Name,
+			"reason":       "attribute_create_fail",
+			"app":          r.pi.appSlug,
+		}).Inc()
+		return
+	}
+	r.Log().WithField("username", username).WithField("before", len(responsePacket.Attributes)).Debug(responsePacket.Attributes)
+
+	err = r.AddVendor_Attribute(responsePacket, 9, 1, attr)
+	r.Log().WithField("username", username).WithField("after", len(responsePacket.Attributes)).Debug(responsePacket.Attributes)
+	if err != nil {
+		r.Log().WithField("username", username).WithError(err).Warning("failed to create attribute")
+		metrics.RequestsRejected.With(prometheus.Labels{
+			"outpost_name": rs.ac.Outpost.Name,
+			"reason":       "attribute_create_fail",
+			"app":          r.pi.appSlug,
+		}).Inc()
+		return
+	}
+
+	_ = w.Write(responsePacket)
 }

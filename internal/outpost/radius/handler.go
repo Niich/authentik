@@ -12,6 +12,7 @@ import (
 	"goauthentik.io/internal/outpost/radius/metrics"
 	"goauthentik.io/internal/utils"
 	"layeh.com/radius"
+	"layeh.com/radius/rfc2865"
 )
 
 type RadiusRequest struct {
@@ -77,4 +78,18 @@ func (rs *RadiusServer) ServeRADIUS(w radius.ResponseWriter, r *radius.Request) 
 	if nr.Code == radius.CodeAccessRequest {
 		rs.Handle_AccessRequest(w, nr)
 	}
+}
+
+func (r *RadiusRequest) AddVendor_Attribute(p *radius.Packet, venderId uint32, typ byte, attr radius.Attribute) (err error) {
+	var vsa radius.Attribute
+	vendor := make(radius.Attribute, 2+len(attr))
+	vendor[0] = typ
+	vendor[1] = byte(len(vendor))
+	copy(vendor[2:], attr)
+	vsa, err = radius.NewVendorSpecific(venderId, vendor)
+	if err != nil {
+		return err
+	}
+	p.Add(rfc2865.VendorSpecific_Type, vsa)
+	return
 }
