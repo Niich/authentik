@@ -1,5 +1,5 @@
 #!/usr/bin/env -S bash -e
-MODE_FILE="${TMPDIR}/authentik-mode"
+MODE_FILE="${TMPDIR:-/dev/shm}/authentik-mode"
 
 function log {
     printf '{"event": "%s", "level": "info", "logger": "bootstrap"}\n' "$@" > /dev/stderr
