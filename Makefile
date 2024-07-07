@@ -69,7 +69,7 @@ lint-codespell:  ## Reports spelling errors.
 
 lint: ## Lint the python and golang sources
 	bandit -r $(PY_SOURCES) -x web/node_modules -x tests/wdio/node_modules -x website/node_modules
-	golangci-lint run -v
+	golangci-lint run -v --timeout 5m0s
 
 core-install:
 	poetry install
