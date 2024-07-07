@@ -5,7 +5,7 @@ from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import Serializer
 
-from authentik.core.models import Provider
+from authentik.core.models import PropertyMapping, Provider
 from authentik.lib.generators import generate_id
 from authentik.outposts.models import OutpostModel
 
@@ -63,3 +63,27 @@ class RadiusProvider(OutpostModel, Provider):
     class Meta:
         verbose_name = _("Radius Provider")
         verbose_name_plural = _("Radius Providers")
+
+class RadiusPropertyMapping(PropertyMapping):
+    """Map User/Group attribute to RADIUS Attribute, which can be used by the Service Provider"""
+
+    radius_reply_attribute = models.TextField(verbose_name="RADIUS Name")
+    attibute_friendly_name = models.TextField(default=None, blank=True, null=True)
+
+    @property
+    def component(self) -> str:
+        return "ak-property-mapping-radius-form"
+
+    @property
+    def serializer(self) -> type[Serializer]:
+        from authentik.providers.radius.property_mappings import RadiusPropertyMappingSerializer
+
+        return RadiusPropertyMappingSerializer
+
+    def __str__(self):
+        name = self.attibute_friendly_name if self.attibute_friendly_name != "" else self.radius_reply_attribute
+        return f"{self.name} ({name})"
+
+    class Meta:
+        verbose_name = _("RADIUS Property Mapping")
+        verbose_name_plural = _("RADIUS Property Mappings")

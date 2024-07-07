@@ -98,6 +98,7 @@
         "@types/codemirror": "5.60.15",
         "@types/grecaptcha": "^3.0.9",
         "@types/guacamole-common-js": "1.5.2",
+        "@types/jquery": "^3.5.30",
         "@types/showdown": "^2.0.6",
         "@typescript-eslint/eslint-plugin": "^7.14.0",
         "@typescript-eslint/parser": "^7.14.0",

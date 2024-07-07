@@ -1,12 +1,17 @@
 """RadiusProvider API Views"""
 
+from django_filters.filters import AllValuesMultipleFilter
+from django_filters.filterset import FilterSet
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework.fields import CharField, ListField
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from authentik.core.api.property_mappings import PropertyMappingSerializer
 from authentik.core.api.providers import ProviderSerializer
 from authentik.core.api.used_by import UsedByMixin
 from authentik.core.api.utils import ModelSerializer
-from authentik.providers.radius.models import RadiusProvider
+from authentik.providers.radius.models import RadiusPropertyMapping, RadiusProvider
 
 
 class RadiusProviderSerializer(ProviderSerializer):
